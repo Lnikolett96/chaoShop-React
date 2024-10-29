@@ -1,15 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap');
 
+:root{
+  --primary-brand-color: #2ca9f1
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Gowun Batang", serif;
 }
 
 body{
   font-size: 16px;
   background-color: #f6f8fa;
-  font-family: "Gowun Batang", serif;
   font-weight: 400;
   font-style: normal;
 }
+
+.align_center{
+  display: flex;
+  align-items: center;
+}
+
+a{
+  font-size: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: 0.7s all ease-in-out;
+}
+
+a:hover{
+  scale: 1.1;
+}
+

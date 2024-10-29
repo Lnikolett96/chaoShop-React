@@ -1,10 +1,16 @@
 import React from 'react'
+import Navbar from './components/Navbar/Navbar'
 import './App.css'
+import Routing from './components/Routing/Routing'
+
+
 const App = () => {
   return (
     <div className='app'>
-      <nav>Navbar</nav>
-      <main>All routing</main>
+      <Navbar />
+      <main>
+        <Routing />
+      </main>
 
     </div>
   )

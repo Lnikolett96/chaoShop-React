@@ -51,6 +51,11 @@
   animation: rotateScale 1s linear infinite;
 }
 
+.navbar_links > a.active {
+    color: #2ca9f1;
+    font-weight: 800;
+}
+
 @keyframes rotateScale { 
     0% { 
         transform: rotate(0deg) scale(1); 
