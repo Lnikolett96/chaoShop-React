@@ -1,11 +1,11 @@
 import React from 'react'
-import './ProductCardSkeleton.css'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
 
 const ProductCardSkeleton = () => {
   return (
-    <div>
-      
-    </div>
+    <Skeleton className='product_card' width='275px' />
   )
 }
 
