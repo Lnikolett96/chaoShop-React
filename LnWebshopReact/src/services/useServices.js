@@ -1,6 +1,9 @@
+import { jwtDecode } from "jwt-decode"
 import apiClient from "../components/utils/appClient"
 
-export function signUp ( user, profilePic ) {
+const tokenName = "token"
+
+export async function signUp ( user, profilePic ) {
     const body = new FormData()
     body.append("name", user.name)
     body.append("email", user.email)
@@ -8,5 +11,25 @@ export function signUp ( user, profilePic ) {
     body.append("deliveryAddress", user.deliveryAddress)
     body.append("profilePic", profilePic)
 
-    return apiClient.post('/user/signup', body)
+    const { data } = await apiClient.post('/user/signup', body)
+    localStorage.setItem(tokenName, data.token)
+}
+
+export async function login ( user ) {
+    const { data } = await apiClient.post('/user/login', user)
+    localStorage.setItem(tokenName, data.token)
+}
+
+export function logout() {
+    localStorage.removeItem(tokenName)
+}
+
+export function getUser() {
+    try {
+        const jwt = localStorage.getItem(tokenName)
+        return jwtDecode(jwt)
+        
+    } catch (error) {
+        return null
+    }
 }
