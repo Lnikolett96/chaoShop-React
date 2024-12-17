@@ -2,7 +2,7 @@ import React from "react";
 import "./MyORderPage.css";
 import Table from "../common/Table";
 
-const MyOrderPage = () => {
+const MyOrderPage = ( { cart } ) => {
   return (
     <section className="align_center myorder_page">
       <Table headings={["Order", "Products", "Total", "Status"]}>

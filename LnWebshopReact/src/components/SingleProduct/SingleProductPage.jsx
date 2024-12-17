@@ -5,7 +5,7 @@ import QuantityInput from "./QuantityInput";
 import useData from "../../hooks/useData";
 import Loader from "../common/Loader"
 
-const SingleProductPage = () => {
+const SingleProductPage = ({ addToCart }) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [ quantity, setQuantity ] = useState(1)
   const { id } = useParams();
@@ -40,7 +40,7 @@ const SingleProductPage = () => {
             <p className="single_product_price">${product.price?.toFixed(2)}</p>
             <h2 className="quantity_title">Quantity:</h2>
             <QuantityInput quantity={quantity} setQuantity={setQuantity} stock={product.stock} />
-            <button className="search_button add_cart_button">Add to Cart</button>
+            <button className="search_button add_cart_button" onClick={() => addToCart(product, quantity)}>Add to Cart</button>
           </div>
         </>
       }

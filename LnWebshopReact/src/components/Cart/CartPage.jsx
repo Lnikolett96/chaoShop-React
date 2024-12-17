@@ -1,11 +1,20 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './CartPage.css'
 import user from '../../assets/user.webp'
 import Table from '../common/Table'
 import remove from '../../assets/remove.png'
 import QuantityInput from '../SingleProduct/QuantityInput'
 
-const CartPage = () => {
+const CartPage = ({ cart }) => {
+    const [subTotal, setSubtotal] = useState(0)
+
+    useEffect(() => {
+        let total = 0
+        cart.forEach(item => {
+            total += item.product.price * item.quantity
+        })
+        setSubtotal(total)
+    }, [cart])
   return (
     <section className="align_center cart_page">
         <div className="align_center user_info">
@@ -21,20 +30,24 @@ const CartPage = () => {
         </div>
         <Table headings={["item", "Price", "Quantity", "Total", "Remove"]}>
             <tbody>
-                <tr>
-                    <td>Iphone 14 Pro</td>
-                    <td>$990</td>
-                    <td className='align_center table_quantity_input'> <QuantityInput /> </td>
-                    <td>$999</td>
+                {cart.map(({product, quantity}) => 
+                <tr key={product._id}>
+                    <td>{product.title}</td>
+                    <td>${product.price}</td>
+                    <td className='align_center table_quantity_input'> <QuantityInput quantity={quantity} stock={product.stock} /> </td>
+                    <td>${parseInt(product.price) * quantity}</td>
                     <td><img src={remove} alt="remove icon" className='cart_remove_icon' /></td>
                 </tr>
+
+
+                )}
             </tbody>
         </Table>
         <table className="cart_bill">
             <tbody>
                 <tr>
                     <td>SubTotal</td>
-                    <td>$990</td>
+                    <td>${subTotal}</td>
                 </tr>
                 <tr>
                     <td>Shipping Charge</td>
@@ -42,7 +55,7 @@ const CartPage = () => {
                 </tr>
                 <tr className='cart_bill_final'>
                     <td>Total</td>
-                    <td>$999</td>
+                    <td>${subTotal + 9}</td>
                 </tr>
             </tbody>
         </table>
