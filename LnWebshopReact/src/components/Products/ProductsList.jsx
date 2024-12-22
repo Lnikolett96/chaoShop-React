@@ -10,11 +10,11 @@ const ProductsList = () => {
   const [search, setSearch] = useSearchParams();
   const [page, setPage] = useState(1)
   const category = search.get("category") || "";
-  
+  const searchQuery = search.get("search")  
   const { data, error, loading } = useData(
     "/products", 
-    { params: { category, perPage: 10, page } }, 
-    [category, page]
+    { params: { search: searchQuery, category, perPage: 10, page } }, 
+    [searchQuery, category, page]
   );
   const skeletons = Array(8).fill(0);
 
@@ -36,8 +36,8 @@ const ProductsList = () => {
 
   useEffect(() => {
     setPage(1)
-  }, [category])
-
+  }, [searchQuery, category])
+  
  
 
   return (
@@ -57,13 +57,7 @@ const ProductsList = () => {
         {data?.products?.map((product) => (
             <ProductCard
               key={product._id}
-              id={product._id}
-              image={product.images[0]}
-              title={product.title}
-              price={product.price}
-              rating={product.reviews.rate}
-              ratingCount={product.reviews.counts}
-              stock={product.stock}
+              product={product}
             />
           ))}
         {loading

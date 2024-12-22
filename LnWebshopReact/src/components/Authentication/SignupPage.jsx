@@ -5,6 +5,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { signUp } from "../../services/useServices";
+import { Navigate } from "react-router-dom";
+import { getUser } from "../../services/useServices";
 
 const schema = z
   .object({
@@ -48,6 +50,10 @@ const SignupPage = () => {
 
     }
   };
+
+  if (getUser()) {
+      <Navigate to={'/'} />
+    }
 
   return (
     <section className="align_center form_page">

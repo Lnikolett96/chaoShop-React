@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import "./LoginPage.css";
 import z  from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { login } from "../../services/useServices";
+import { getUser, login } from "../../services/useServices";
+import { Navigate, useLocation } from 'react-router-dom';
 
 const schema = z.object({
   email: z.string().email().min(7, "Email must be at least 7 characters long"),
@@ -14,16 +15,22 @@ const LoginPage = () => {
  
   const { register, handleSubmit, formState: {errors} } = useForm({resolver: zodResolver(schema)})
   const [error, setError] = useState(null)
+  const location = useLocation()
 
   const onSubmit = async (formData) => {
     try {
       setError(null)
       await login(formData)
-      window.location = "/"
+      const { state } = location
+      window.location = state ? state.from :  "/"
     } catch (error) {
       
       setError(error.response.data.message)
     }
+  }
+
+  if (getUser()) {
+    <Navigate to={'/'} />
   }
 
   return (
