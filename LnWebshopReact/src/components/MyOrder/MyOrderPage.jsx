@@ -5,7 +5,7 @@ import useData from "../../hooks/useData";
 import Loader from "../common/Loader";
 
 const MyOrderPage = () => {
-  const { data: orders, error, isLoading } = useData("/order");
+  const { data: orders, error, isLoading } = useData("/order", null, ['myorders'], 1 * 60 * 1000);
 
   const getProductNames = (order) => {
     const productStringArray = order.products.map(p => `${p.product.title}(${p.quantity})`)

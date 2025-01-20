@@ -1,50 +1,74 @@
 import React, { useEffect, useState } from "react";
 import "./ProductsList.css";
 import ProductCard from "./ProductCard";
-import useData from "../../hooks/useData";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { useSearchParams } from "react-router-dom";
-import Pagination from "../common/Pagination";
+import useProductList from "../../hooks/useProductList";
 
 const ProductsList = () => {
   const [search, setSearch] = useSearchParams();
-  const [page, setPage] = useState(1)
+  const [sortBy, setSortBy] = useState("");
+  const [sortedProducts, setSortedProducts] = useState([]);
   const category = search.get("category") || "";
-  const searchQuery = search.get("search")  
-  const { data, error, loading } = useData(
-    "/products", 
-    { params: { search: searchQuery, category, perPage: 10, page } }, 
-    [searchQuery, category, page]
-  );
-  const skeletons = Array(8).fill(0);
+  const searchQuery = search.get("search");
+  const { data, error, isFetching, hasNextPage, fetchNextPage } = useProductList({
+    search: searchQuery,
+    category,
+    perPage: 10,
+  });
+  console.log(data)
+  const skeletons = Array().fill(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+      console.log(scrollTop, clientHeight, scrollHeight)
 
-      if (scrollTop + clientHeight >= scrollHeight - 1 && !loading && data && page < data.totalPages) {
-        setPage(prev => prev + 1)
+      if (scrollTop + clientHeight >= scrollHeight - 10  && !isFetching && hasNextPage) {
+        console.log("reached bottom")
+        fetchNextPage();
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [data, loading])
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [data, isFetching]);
 
   useEffect(() => {
-    setPage(1)
-  }, [searchQuery, category])
-  
- 
+    if (data && data.pages) {
+      const products = data.pages.flatMap((page) => page.products);
+
+      if (sortBy === "price desc") {
+        setSortedProducts(products.sort((a, b) => b.price - a.price));
+      } else if (sortBy === "price asc") {
+        setSortedProducts(products.sort((a, b) => a.price - b.price));
+      } else if (sortBy === "rate desc") {
+        setSortedProducts(
+          products.sort((a, b) => b.reviews.rate - a.reviews.rate)
+        );
+      } else if (sortBy === "rate asc") {
+        setSortedProducts(
+          products.sort((a, b) => a.reviews.rate - b.reviews.rate)
+        );
+      } else {
+        setSortedProducts(products);
+      }
+    }
+  }, [sortBy, data]);
 
   return (
     <section className="products_list_section">
       <header className="align_center products_list_header">
         <h2>Products</h2>
-        <select name="sort" id="sortingSelect" className="product_sorting">
+        <select
+          name="sort"
+          id="sortingSelect"
+          className="product_sorting"
+          onChange={(e) => setSortBy(e.target.value)}
+        >
           <option value="">Relevance</option>
           <option value="price desc">Price HIGH to LOW</option>
           <option value="price asc">Price LOW to HIGH</option>
@@ -54,23 +78,14 @@ const ProductsList = () => {
       </header>
       <div className="products_list">
         {error && <em className="form_error">{error}</em>}
-        {data?.products?.map((product) => (
-            <ProductCard
-              key={product._id}
-              product={product}
-            />
+
+        {
+          sortedProducts.map((product) => (
+            <ProductCard key={product._id} product={product} />
           ))}
-        {loading
-          && skeletons.map((_, index) => <ProductCardSkeleton key={index} />)}
+        {isFetching &&
+          skeletons.map((_, index) => <ProductCardSkeleton key={index} />)}
       </div>
-      {/* {data && (
-        <Pagination
-          totalPosts={data.totalProducts}
-          postPerPage={8}
-          onClick={handlePageChange}
-          currentPage={page}
-        />
-      )} */}
     </section>
   );
 };

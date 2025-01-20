@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState, memo } from "react";
 import { useParams } from "react-router-dom";
 import "./SingleProductPage.css";
 import QuantityInput from "./QuantityInput";
@@ -11,7 +11,7 @@ const SingleProductPage = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
-  const { data: product, error, loading } = useData(`/products/${id}`);
+  const { data: product, error, loading } = useData(`/products/${id}`, null, ["products", id], );
   const { addToCart } = useContext(cartContext);
   const user = useContext(userContext);
 
@@ -65,4 +65,4 @@ const SingleProductPage = () => {
   );
 };
 
-export default SingleProductPage;
+export default memo(SingleProductPage);

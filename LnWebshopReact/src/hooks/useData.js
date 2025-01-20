@@ -1,33 +1,14 @@
-import React, { useState, useEffect } from 'react'
 import appClient from '../components/utils/appClient'
+import { useQuery } from '@tanstack/react-query'
 
-const useData = (endpoint, customConfig, deps) => {
-    const [data, setData] = useState([])
-    const [error, setError] = useState("")
-    const [loading, setLoading] = useState(false)
-  
-    useEffect(() => {
-      const getData = async () => {
-        try {
-          setLoading(true)
-          const response = await appClient.get(endpoint, customConfig)
-          if (endpoint === '/products' && data && data.products && customConfig.params.page !== 1) {
-            setData(prev => ({
-              ...prev, products: [...prev.products, ...response.data.products]
-            }))
-          } else {
-            setData(response.data)
-          }
-          setLoading(false)
-        } catch (error) {
-          setError(error)
-          setLoading(false)
-        }
-      }
-  
-      getData()
-    }, deps ? deps : [])
-    return { data, error, loading }
+const useData = (endpoint, customConfig = {}, queryKey, staleTime = 300_000) => {
+  const fetchFunction = () => appClient.get(endpoint, customConfig).then(res => res.data) 
+  return useQuery({
+    queryKey: [queryKey],
+    queryFn: fetchFunction,
+    staleTime: staleTime
+
+   })
 }
 
 export default useData
