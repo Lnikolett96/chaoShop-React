@@ -6,16 +6,25 @@ import cartContext from './contexts/CartContext'
 import { ToastContainer, toast } from 'react-toastify'
 import { getUser } from './services/useServices'
 import setAuthToken from './components/utils/setAuthToken'
-import { addToCartApi, decreaseProductApi, getCartApi, increaseProductApi, removeFromCartApi } from './services/cartServices'
 import './App.css'
 import 'react-toastify/dist/ReactToastify.css'
+import useAddToCart from './hooks/cart/useAddToCart'
+import { useGetCart } from './hooks/cart/useGetCart'
+import useRemoveFromCart from './hooks/cart/useRemoveFromCart'
+import useUpdateCart from './hooks/cart/useUpdateCart'
 
 
 setAuthToken(localStorage.getItem("token"))
 
 const App = () => {
   const [user, setUser] = useState(null)
-  const [cart, setCart] = useState([])
+  const { data: cart = [], isLoading, error } = useGetCart({
+    enabled: !!user
+  });
+  const addToCartMutation = useAddToCart()
+  const removeCartMutation = useRemoveFromCart()
+  const updateCartIncreaseMutation = useUpdateCart('increase')
+  const updateCartDecreaseMutation = useUpdateCart("decrease")
 
   useEffect(() => {
     try {
@@ -37,64 +46,55 @@ const App = () => {
   }, [])
 
   const addToCart = (product, quantity) => {
-    const updatedCart = [...cart]
-    const productIndex = updatedCart.findIndex(item => item.product._id === product._id)
-
-    if (productIndex === -1) {
-      updatedCart.push({product: product, quantity: quantity})
-    } else {
-      updatedCart[productIndex].quantity += quantity
-    }
-
-    setCart(updatedCart)
-    addToCartApi(product._id, quantity).then(res => { toast.success("Product Added Successfully!") }).catch(err => { toast.error(err.message) , setCart(cart) })
-  }
+    const oldCart = [...cart]; // Eredeti kosár állapot mentése
+  
+    addToCartMutation.mutate(
+      { id: product._id, quantity },
+      {
+        onMutate: async () => {
+          // Optimista frissítés: helyi kosár módosítása a felhasználó élményének javítására
+          const newCart = [...oldCart];
+          const productIndex = newCart.findIndex(
+            (item) => item.product._id === product._id
+          );
+  
+          if (productIndex === -1) {
+            newCart.push({ product, quantity });
+          } else {
+            newCart[productIndex].quantity += quantity;
+          }
+  
+          queryClient.setQueryData(["cart"], newCart);
+  
+          return { previousCart: oldCart }; // Az eredeti állapot mentése
+        },
+        onError: (error, variables, context) => {
+          toast.error("Something went wrong!");
+          // Visszaállítás a mentett kosár állapotra
+          if (context?.previousCart) {
+            queryClient.setQueryData(["cart"], context.previousCart);
+          }
+        },
+      }
+    );
+  };
 
   const removeFromCart = (id) => {
-    const oldCart = [...cart]
-    const newCart = oldCart.filter(item => item.product._id !== id)
-    setCart(newCart)
-    removeFromCartApi(id).catch(err => {
-      toast.error("Something went wrong!")
-      setCart(oldCart)
-    })
+    removeCartMutation.mutate({id: id})
   }
 
-  const updateCart = (type ,id) => {
-    const oldCart = [...cart]
-    const updatedCart = [...cart]
-    const productIndex = updatedCart.findIndex(item => item.product._id === id)
+  const updateCart = (type, id) => {
 
     if (type === 'increase') {
-      updatedCart[productIndex].quantity += 1
-      setCart(updatedCart)
-      increaseProductApi(id).catch(err => {
-        toast.error('Something went wrong!')
-        setCart(oldCart)
-      })
+      updateCartIncreaseMutation.mutate({id})
     } else {
-      updatedCart[productIndex].quantity -= 1
-      setCart(updatedCart)
-      decreaseProductApi(id).catch(err => {
-        toast.error('Something went wrong!')
-        setCart(oldCart)
-      })
+      updateCartDecreaseMutation.mutate({id})
     }
   }
-
-  const getCart = () => {
-    getCartApi().then( res => {setCart( res.data )}).catch(err => {toast.error('Failed To Load the cart!')})
-  }
-
-  useEffect(() => {
-    if (user) {
-      getCart()
-    }
-  }, [user])
 
   return (
     <userContext.Provider value={user}>
-      <cartContext.Provider value={{cart, addToCart, removeFromCart, updateCart, setCart}}>
+      <cartContext.Provider value={{cart, addToCart, removeFromCart, updateCart}}>
 
         <div className='app'>
           <Navbar />

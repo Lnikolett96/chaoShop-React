@@ -16,16 +16,13 @@ const ProductsList = () => {
     category,
     perPage: 10,
   });
-  console.log(data)
   const skeletons = Array().fill(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-      console.log(scrollTop, clientHeight, scrollHeight)
 
       if (scrollTop + clientHeight >= scrollHeight - 10  && !isFetching && hasNextPage) {
-        console.log("reached bottom")
         fetchNextPage();
       }
     };

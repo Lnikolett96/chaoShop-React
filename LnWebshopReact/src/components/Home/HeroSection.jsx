@@ -1,18 +1,19 @@
 import React from 'react'
 import './HeroSection.css'
 import { Link } from 'react-router-dom'
+import {motion} from 'motion/react'
 
 const HeroSection = ({ title,subtitle, link, image }) => {
   return (
     <section className='hero_section'>
-        <div className="align_center">
+        <motion.div className="align_center" initial={{opacity: 0, x: -100}} whileInView={{opacity: 1, x: 0}} transition={{ duration: 2, ease: "easeInOut" }} >
             <h2 className="hero_title">{title}</h2>
             <p className="hero_subtitle">{subtitle}</p>
             <Link to={link} className='hero_link'>Buy now!</Link>
-        </div>
-        <div className="align_center">
+        </motion.div>
+        <motion.div className="align_center" initial={{opacity: 0, x: 100}} whileInView={{opacity: 1, x: 0}} transition={{ duration: 2, ease: "easeInOut" }} >
             <img src={image} alt={title + "image"} className='hero_image' />
-        </div>
+        </motion.div>
     </section>
   )
 }
