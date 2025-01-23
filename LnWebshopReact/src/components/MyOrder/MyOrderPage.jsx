@@ -1,5 +1,5 @@
 import React from "react";
-import "./MyORderPage.css";
+import "./MyOrderPage.css";
 import Table from "../common/Table";
 import useData from "../../hooks/useData";
 import Loader from "../common/Loader";
