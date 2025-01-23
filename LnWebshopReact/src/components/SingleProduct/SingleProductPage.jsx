@@ -1,4 +1,5 @@
 import React, { useContext, useState, memo } from "react";
+import config from '../../config.json'
 import { useParams } from "react-router-dom";
 import "./SingleProductPage.css";
 import QuantityInput from "./QuantityInput";
@@ -27,13 +28,13 @@ const SingleProductPage = () => {
                 <img
                   className={selectedImage === index ? "selected_image" : ""}
                   onClick={() => setSelectedImage(index)}
-                  src={`http://localhost:5000/products/${image}`}
+                  src={`${config.backendURL}/products/${image}`}
                   alt={product.title}
                 />
               ))}
             </div>
             <img
-              src={`http://localhost:5000/products/${product.images[selectedImage]}`}
+              src={`${config.backendURL}/products/${product.images[selectedImage]}`}
               alt={product.title}
               className="single_product_display"
             />
