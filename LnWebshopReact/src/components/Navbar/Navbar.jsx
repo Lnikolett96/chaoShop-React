@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 import './Navbar.css'
-import {motion} from 'motion/react'
 import rocket from '../../assets/rocket.png'
 import star from '../../assets/glowing-star.png'
 import idButton from '../../assets/id-button.png'
@@ -57,7 +56,7 @@ const Navbar = () => {
   }, [search])
 
   return (
-    <motion.nav className='navbar align_center' initial={{ opacity: 0, y: -30 }} animate={{opacity: 1, y: 0}} transition={{duration: 3, ease: "easeInOut"}}>
+    <nav className='navbar align_center'>
       <div className='align_center'>
         <h1 className='navbar_heading'>Chao<div className='s-word'>S</div>hop</h1>
         <form action="" className="align_center navbar_form" onSubmit={handleSubmit}>
@@ -91,7 +90,7 @@ const Navbar = () => {
           </NavLink> 
           </>}
       </div>
-    </motion.nav>
+    </nav>
   )
 }
 
